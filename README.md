@@ -35,13 +35,11 @@ Make sure to enable the following APIs in your Google Cloud Platform project:
 
 - **Cloud Run**: This API allows you to deploy and manage containerized applications on Google Cloud Run.
 - **Container Registry**: This API allows you to store, manage, and deploy Docker container images on Google Container Registry.
+- **Identity and Access Management (IAM) API**: This API allows you to manage service account permissions on Google Cloud Platform.
 
 ### Create Service Account
 
-Create a service account with appropriate permissions to deploy resources on Google Cloud Platform. At a minimum, the service account should have the following roles:
-
-- **Cloud Run Admin (roles/run.admin)**: Allows full access to Cloud Run resources.Allows full access to Cloud Run resources.
-- **Storage Object Admin (roles/storage.objectAdmin)**: Allows full control of Google Cloud Storage objects.
+Create a service account with appropriate permissions to deploy resources on Google Cloud Platform.
 
 
 ## Terraform Configuration
