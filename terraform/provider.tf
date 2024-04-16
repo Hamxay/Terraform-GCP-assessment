@@ -1,5 +1,5 @@
 provider "google" {
   credentials = file("key.json")
-  project     = "terraform-learning-419716"
-  region      = "us-central1"
+  project     = var.project_id
+  region      = var.region
 }

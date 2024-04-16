@@ -1,13 +1,13 @@
 # Create a Cloud Run service
-resource "google_cloud_run_service" "fastapi_service" {
-    name = "fastapi-app"
+resource "google_cloud_run_service" "terraform_learning_service" {
+    name = "terraform-learning"
     location  = "us-central1"
 
 
-    template {
+  template {
     spec {
       containers {
-        image = "gcr.io/terraform-learning-419716/terraform-learning:latest"
+        image = "gcr.io/${var.project_id}/${var.repository}"
       }
     }
   }
@@ -20,7 +20,7 @@ resource "google_cloud_run_service" "fastapi_service" {
 
 # Optional: Grant access to Cloud Run service (replace with your IAM role)
 resource "google_cloud_run_service_iam_member" "allow_all_users" {
-    service = google_cloud_run_service.fastapi_service.name
+    service = google_cloud_run_service.terraform_learning_service.name
     role    = "roles/run.invoker"
     member  = "allUsers"
 }

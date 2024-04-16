@@ -1,0 +1,14 @@
+variable "project_id" {
+  description = "The ID of the Google Cloud Platform project"
+  default     = "Add the value of your project ID here"
+}
+
+variable "region" {
+  description = "The region where the Cloud Run service will be deployed"
+  default     = "us-central1"
+}
+
+variable "repository" {
+  description = "The name of the Google Container Registry repository"
+  default     = "Add the value of your repository name here"
+}

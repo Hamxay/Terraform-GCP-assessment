@@ -13,6 +13,8 @@ In this project, we use Terraform to provision the necessary infrastructure on G
 The project includes the following files:
 
 - `main.tf`: Terraform configuration file defining the Google Cloud Run service.
+- `provider.tf`: Terraform configuration file defining the provider and project settings.
+- `variables.tf`: Terraform configuration file defining input variables.
 - `Dockerfile`: Dockerfile for building the container image for the FastAPI application.
 - `requirements.txt`: Python dependencies required for the FastAPI application.
 - `main.py`: Main Python file containing the FastAPI application code.
@@ -26,6 +28,29 @@ Before running the deployment, ensure you have the following prerequisites:
 - Google Cloud SDK installed locally
 - Docker installed locally
 - Terraform installed locally
+
+## Terraform Configuration
+
+### `variables.tf`
+
+The `variables.tf` file contains the definition of input variables used in the Terraform configuration:
+
+```hcl
+variable "project_id" {
+  description = "The ID of the Google Cloud Platform project"
+  default     = "Add the value of your project ID here"
+}
+
+variable "region" {
+  description = "The region where the Cloud Run service will be deployed"
+  default     = "us-central1"
+}
+
+variable "repository" {
+  description = "The name of the Google Container Registry repository"
+  default     = "Add the value of your repository name here"
+}
+```
 
 ## Deployment Steps
 
@@ -49,28 +74,28 @@ To deploy the FastAPI application on Google Cloud Run, follow these steps:
     terraform plan
     ```
 
-4. Apply the Terraform configuration:
+4. Build the Docker image:
+
+    ```bash
+    docker build -t gcr.io/your-project-id/your-image .
+    ```
+
+5. Push the Docker image to Google Container Registry (GCR):
+
+    ```bash
+    docker push gcr.io/your-project-id/your-image
+    ```
+
+
+6. Apply the Terraform configuration:
 
     ```bash
     terraform apply
     ```
 
-5. Build the Docker image:
-
-    ```bash
-    docker build -t gcr.io/your-project-id/fastapi-app .
-    ```
-
-6. Push the Docker image to Google Container Registry (GCR):
-
-    ```bash
-    docker push gcr.io/your-project-id/fastapi-app
-    ```
-
 7. Access the Cloud Run service URL:
 
     The Cloud Run service URL will be displayed in the Terraform output after successful deployment. You can also find it in the Google Cloud Console under the Cloud Run section.
-
 ## Testing
 
 To test the deployed FastAPI application, you can send HTTP requests to the Cloud Run service URL using tools like cURL, Postman, or a web browser.
@@ -88,7 +113,7 @@ To avoid incurring unnecessary charges, make sure to clean up the resources afte
 2. Delete the container image from Google Container Registry (optional):
 
     ```bash
-    gcloud container images delete gcr.io/your-project-id/fastapi-app
+    gcloud container images delete gcr.io/your-project-id/your-image
     ```
 
 ## Resources
