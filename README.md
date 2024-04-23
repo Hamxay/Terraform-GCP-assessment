@@ -19,6 +19,7 @@ The project includes the following files:
 - `requirements.txt`: Python dependencies required for the FastAPI application.
 - `main.py`: Main Python file containing the FastAPI application code.
 - `README.md`: This README file providing an overview of the project.
+- `.env`: Environment variables file containing sensitive configuration settings.
 
 ## Prerequisites
 
@@ -28,6 +29,7 @@ Before running the deployment, ensure you have the following prerequisites:
 - Google Cloud SDK installed locally
 - Docker installed locally
 - Terraform installed locally
+- PostgreSQL database server (or any other supported database)
 
 ### Enable APIs
 
@@ -64,6 +66,43 @@ variable "repository" {
   default     = "Add the value of your repository name here"
 }
 ```
+
+### Configuration
+
+1. Set up your environment variables:
+
+   - Create a `.env` file in the project root directory.
+   - Define the required environment variables in the `.env` file:
+
+     ```dotenv
+     GOOGLE_CLOUD_PROJECT='your-google-cloud-project-id'
+     GOOGLE_APPLICATION_CREDENTIALS='path-to-service-account-key-json-file'
+     PUBSUB_TOPIC='your-pubsub-topic-name'
+     PUBSUB_SUBSCRIPTION='your-pubsub-subscription-name'
+     DB_NAME='your-database-name'
+     DB_USER='your-database-user'
+     DB_PASSWORD='your-database-password'
+     DB_HOST='your-database-host'
+     ```
+
+     Replace the placeholders with your actual values.
+
+### Database Setup
+
+1. Create a database in your PostgreSQL server.
+2. Create a table named `ids_table` with the following columns:
+   - `id`: Primary key column (integer type).
+
+### Google Cloud Pub/Sub Setup
+
+1. Create a topic and subscription in Google Cloud Pub/Sub:
+
+   - Navigate to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Select your project (or create a new one).
+   - In the sidebar, navigate to **Pub/Sub > Topics**.
+   - Click **Create Topic** and enter a name for your topic.
+   - Navigate to **Pub/Sub > Subscriptions**.
+   - Click **Create Subscription** and enter a name for your subscription. Choose the topic you created earlier.
 
 ## Deployment Steps
 
@@ -109,6 +148,12 @@ To deploy the FastAPI application on Google Cloud Run, follow these steps:
 7. Access the Cloud Run service URL:
 
     The Cloud Run service URL will be displayed in the Terraform output after successful deployment. You can also find it in the Google Cloud Console under the Cloud Run section.
+
+### Usage
+
+- Visit `http://localhost:8000/docs` in your browser to access the interactive API documentation (Swagger UI) and explore the available endpoints.
+- Use a tool like [Postman](https://www.postman.com/) to make requests to the API endpoints.
+
 ## Testing
 
 To test the deployed FastAPI application, you can send HTTP requests to the Cloud Run service URL using tools like cURL, Postman, or a web browser.
