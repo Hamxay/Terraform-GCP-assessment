@@ -69,7 +69,7 @@ variable "repository" {
 
 ### Configuration
 
-1. Set up your environment variables:
+To run the project locally using docker-compose, set up your environment variables:
 
    - Create a `.env` file in the project root directory.
    - Define the required environment variables in the `.env` file:
@@ -83,6 +83,16 @@ variable "repository" {
      ```
 
      Replace the placeholders with your actual values.
+
+To run the project on Google Cloud Platform, set up your environment variables in Dockerfile:
+
+```Dockerfile
+ENV GOOGLE_CLOUD_PROJECT='your-google-cloud-project-id'
+ENV GOOGLE_APPLICATION_CREDENTIALS='path-to-service-account-key-json-file'
+ENV PUBSUB_TOPIC='your-pubsub-topic-name'
+ENV PUBSUB_SUBSCRIPTION='your-pubsub-subscription-name'
+ENV DATABASE_URL='your-database-url'
+```
 
 ### Google Cloud Pub/Sub Setup
 
