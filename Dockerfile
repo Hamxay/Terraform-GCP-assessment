@@ -3,7 +3,12 @@ FROM python:3.12-slim
 
 # Set environment variables to prevent Python from writing pyc files and buffering stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    GOOGLE_CLOUD_PROJECT='' \
+    GOOGLE_APPLICATION_CREDENTIALS='' \
+    PUBSUB_TOPIC='' \
+    PUBSUB_SUBSCRIPTION='' \
+    DATABASE_URL=postgresql://postgres:webdir123R@147.182.229.74:5432/terraform
 
 # Install system dependencies
 RUN apt-get update \
@@ -25,10 +30,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# Expose port 8000 to the outside world
-EXPOSE 8000
+# Expose port 8080 to the outside world
+EXPOSE 8080
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 
