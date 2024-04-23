@@ -1,4 +1,4 @@
-# Create a Cloud Run service
+# Deploy the Cloud Run service
 resource "google_cloud_run_service" "terraform_learning_service" {
     name = "terraform-learning"
     location  = "us-central1"

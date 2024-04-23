@@ -79,19 +79,10 @@ variable "repository" {
      GOOGLE_APPLICATION_CREDENTIALS='path-to-service-account-key-json-file'
      PUBSUB_TOPIC='your-pubsub-topic-name'
      PUBSUB_SUBSCRIPTION='your-pubsub-subscription-name'
-     DB_NAME='your-database-name'
-     DB_USER='your-database-user'
-     DB_PASSWORD='your-database-password'
-     DB_HOST='your-database-host'
+     DATABASE_URL='your-database-url'
      ```
 
      Replace the placeholders with your actual values.
-
-### Database Setup
-
-1. Create a database in your PostgreSQL server.
-2. Create a table named `ids_table` with the following columns:
-   - `id`: Primary key column (integer type).
 
 ### Google Cloud Pub/Sub Setup
 
@@ -103,6 +94,28 @@ variable "repository" {
    - Click **Create Topic** and enter a name for your topic.
    - Navigate to **Pub/Sub > Subscriptions**.
    - Click **Create Subscription** and enter a name for your subscription. Choose the topic you created earlier.
+
+
+### Running on Docker-Compose locally
+
+To run the deployment locally using Docker-Compose, follow these steps:
+
+1. Build the Docker image:
+
+    ```bash
+    docker-compose build
+    ```
+
+2. Run the Docker image:
+
+    ```bash
+    docker-compose up
+    ```
+
+### Usage
+
+- Visit `http://localhost:8000/docs` in your browser to access the interactive API documentation (Swagger UI) and explore the available endpoints.
+- Use a tool like [Postman](https://www.postman.com/) to make requests to the API endpoints.
 
 ## Deployment Steps
 
@@ -149,10 +162,6 @@ To deploy the FastAPI application on Google Cloud Run, follow these steps:
 
     The Cloud Run service URL will be displayed in the Terraform output after successful deployment. You can also find it in the Google Cloud Console under the Cloud Run section.
 
-### Usage
-
-- Visit `http://localhost:8000/docs` in your browser to access the interactive API documentation (Swagger UI) and explore the available endpoints.
-- Use a tool like [Postman](https://www.postman.com/) to make requests to the API endpoints.
 
 ## Testing
 

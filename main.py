@@ -1,75 +1,61 @@
 from typing import List
 from fastapi import FastAPI, BackgroundTasks
-from contextlib import asynccontextmanager
-import asyncio
-import asyncpg
-from google.cloud import pubsub_v1
 from dotenv import load_dotenv
+import asyncio
 import os
+from models.models import ID, SessionLocal
 
 load_dotenv()
 
-GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
-GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC")
-PUBSUB_SUBSCRIPTION = os.getenv("PUBSUB_SUBSCRIPTION")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-
 
 async def process_ids_async(ids: List[int]):
-    # Connect to the database
-    connection = await asyncpg.connect(
-        user=DB_USER, password=DB_PASSWORD, database=DB_NAME, host=DB_HOST
-    )
+    from google.cloud import pubsub_v1
 
     # Publish data to Pub/Sub feed asynchronously
     publisher = pubsub_v1.PublisherClient.from_service_account_json(
-        GOOGLE_APPLICATION_CREDENTIALS
+        os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     )
-    topic_path = publisher.topic_path(GOOGLE_CLOUD_PROJECT, PUBSUB_TOPIC)
+    topic_path = publisher.topic_path(
+        os.getenv("GOOGLE_CLOUD_PROJECT"), os.getenv("PUBSUB_TOPIC")
+    )
 
     # Query database for each ID and publish data to Pub/Sub feed
-    for id in ids:
-        # Query database asynchronously
-        try:
-            result = await connection.fetchrow(
-                "SELECT * FROM ids_table WHERE id = $1", id
-            )
-            if result:  # Record exists, publish data
+    db = SessionLocal()
+    try:
+        for id in ids:
+            # Query database asynchronously
+            result = db.query(ID).filter(ID.id == id).first()
+            if result:
                 data = str(result)
-            else:  # Record doesn't exist, create it and publish
-                # Insert logic
-                await connection.execute("INSERT INTO ids_table (id) VALUES ($1)", id)
-                # Assuming 'id' is the only column, adjust if needed
-                print(f"Created record for ID {id}")
+            else:
+                # Record doesn't exist, create it and publish
+                new_record = ID(id=id)
+                db.add(new_record)
+                db.commit()
+                data = str(new_record)
 
-                # After creating, fetch the newly inserted data
-                new_result = await connection.fetchrow(
-                    "SELECT * FROM ids_table WHERE id = $1", id
-                )
-                data = str(new_result)
-
-            # Get the message ID after publishing (fix await issue)
+            # Publish data
             future = publisher.publish(topic_path, data.encode())
             message_id = future.result()
             print(f"Published message ID: {message_id}")
-        except Exception as e:
-            print(f"Error publishing message for ID {id}: {e}")
 
-    # Close database connection
-    await connection.close()
+    except Exception as e:
+        print(f"Error publishing message: {e}")
+        db.rollback()
+
+    finally:
+        db.close()
 
 
 # Function to listen to Pub/Sub feed
 async def listen_to_pubsub():
+    from google.cloud import pubsub_v1
+
     subscriber = pubsub_v1.SubscriberClient.from_service_account_json(
-        GOOGLE_APPLICATION_CREDENTIALS
+        os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     )
     subscription_path = subscriber.subscription_path(
-        GOOGLE_CLOUD_PROJECT, PUBSUB_SUBSCRIPTION
+        os.getenv("GOOGLE_CLOUD_PROJECT"), os.getenv("PUBSUB_SUBSCRIPTION")
     )
 
     def callback(message):
@@ -87,7 +73,6 @@ async def listen_to_pubsub():
 
 
 # Run Pub/Sub listener in a separate thread
-@asynccontextmanager
 async def lifespan(app: FastAPI):
     asyncio.create_task(listen_to_pubsub())
     yield
@@ -106,4 +91,4 @@ async def process_ids(background_tasks: BackgroundTasks, ids: List[int]):
 
 @app.get("/")
 def read_root():
-    return {"Hello,": "Welcome to FastAPI!"}
+    return {"Hello": "Welcome to FastAPI!"}
